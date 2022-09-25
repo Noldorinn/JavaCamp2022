@@ -1,5 +1,6 @@
+package variables;
 
-public class variables {
+public class Main {
 
     public static void main(String[] args) {
         int ogrenciSayisi = 12;
@@ -11,3 +12,4 @@ public class variables {
 
     }
 }
+

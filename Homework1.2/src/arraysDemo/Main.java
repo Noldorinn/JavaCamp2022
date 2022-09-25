@@ -1,5 +1,6 @@
+package arraysDemo;
 
-public class arraysDemo {
+public class Main {
     public static void main(String[] args) {
         String ogrenci1 = "Engin";
         String ogrenci2 = "Derin";

@@ -1,5 +1,6 @@
+package arkadasSayilar;
 
-public class arkadasSayilar {
+public class Main {
 	public static void main(String[] args) {
 	       //220-284 kendileri hariç pozitif tam bölenleri toplamı biribirine eşit
 	        //benim yapmaya çalıştığım:
