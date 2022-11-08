@@ -1,11 +1,17 @@
 package kodlama.io.devs.business.concretes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kodlama.io.devs.business.abstracts.LanguageService;
+import kodlama.io.devs.business.requests.CreateLanguageRequest;
+import kodlama.io.devs.business.requests.DeleteLanguageRequest;
+import kodlama.io.devs.business.requests.UpdateLanguageRequest;
+import kodlama.io.devs.business.responses.GetAllLanguagesResponse;
+import kodlama.io.devs.business.responses.GetLanguageByIdResponse;
 import kodlama.io.devs.dataAccess.abstracts.LanguageRepository;
 import kodlama.io.devs.entities.concretes.Language;
 
@@ -21,60 +27,76 @@ public class LanguageManager implements LanguageService {
 
 
 	@Override
-	public List<Language> getAll() {
+	public List<GetAllLanguagesResponse> getAll() {
+		
+		List<Language> languages = languageRepository.findAll();
+		List<GetAllLanguagesResponse> languagesResponses = new ArrayList<GetAllLanguagesResponse>();
+		
+		for (Language language : languages) {
+			GetAllLanguagesResponse responseItem = new GetAllLanguagesResponse();
+			responseItem.setId(language.getId());
+			responseItem.setName(language.getName());
+			
+			languagesResponses.add(responseItem);
+		}
+		
 		// iş kuralları
-		return languageRepository.getAll();
+		return languagesResponses;
 	}
 
 
-	@Override
-	public Language getById(int id) {
-		return languageRepository.getById(id);
-	}
-
 
 	@Override
-	public void create(Language language) throws Exception {
-		if (isLanguageExist(language)) {
-			throw new Exception("Language already exists");
-		}
+	public void add(CreateLanguageRequest createLanguageRequest) {
 		
-		if (checkLanguageNameValid(language)) {
-			throw new Exception("Language name is invalid");
-		}
+		Language language = new Language();
+		language.setName(createLanguageRequest.getName());
 		
-		languageRepository.create(language);
-	}
-
-
-	@Override
-	public void update(int id, Language language) throws Exception {
-		if (isLanguageExist(language)) {
-			throw new Exception("Language already exists");
-		}
+		this.languageRepository.save(language);
 		
-		if (checkLanguageNameValid(language)) {
-			throw new Exception("Language name is invalid");
-		}
-		
-		languageRepository.update(id, language);
-	}
-
-
-	@Override
-	public void delete(int id) {
-		languageRepository.delete(id);
 	}
 	
-	public boolean isLanguageExist(Language language) {
-		return languageRepository.getAll().stream().anyMatch(l -> l.getName().equals(language.getName()));}
-	
-	public boolean checkLanguageNameValid(Language language) {
-		return language.getName().isEmpty()|| language.getName().isBlank()||language.getName().length()<2;
+
+	@Override
+	public void update(UpdateLanguageRequest updateLanguageRequest) {
+		Language language = this.languageRepository.findById(updateLanguageRequest.getId()).get();
+		language.setName(updateLanguageRequest.getNewname());
+		if (!isExist(language)) {
+			this.languageRepository.save(language);
+		}else {
+			throw new RuntimeException("This language already exist!");
+		}
+	}
+
+
+	@Override
+	public void delete(DeleteLanguageRequest deleteLanguageRequest) {
+		this.languageRepository.deleteById(deleteLanguageRequest.getId());
 		
 	}
 
 
+	@Override
+	public GetLanguageByIdResponse getById(int id) {
+		Language language = this.languageRepository.findById(id).get();
+		GetLanguageByIdResponse byIdResponse = new GetLanguageByIdResponse();
+		byIdResponse.setId(language.getId());
+		byIdResponse.setName(language.getName());
+		
+		return byIdResponse;
+	}
+
+	public boolean isExist(Language language) {
+		boolean exist = false;
+		List<Language> languages = languageRepository.findAll();
+		for (Language language2 : languages) {
+			if (language2.getName().toLowerCase().equals(language.getName().toLowerCase())) {
+				exist = true;
+				return exist;
+			}
+		}
+		return exist;
+	}
 	
 
 
